@@ -3,93 +3,153 @@
 **Version:** 0.1 (working draft)  
 **Status:** Draft for review  
 **License:** Apache 2.0  
+**Reference implementation:** Ojas (pending)  
 
-OACP is a **transport-neutral, contract-first protocol for governed agent-runtime communication**. It defines a typed envelope, deterministic processing gates, and a two‑axis profile system (Core → Operational → Governed → Regulated) that makes agent communication **auditable, replay‑safe, and policy‑enforceable**.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-> **Safety boundary:** OACP is an **operational AI governance protocol**. It helps make agent actions attributable, scoped, policy‑bound, reviewable, and auditable. It does **not** guarantee model alignment, truthfulness, or safety. Those remain the responsibility of the model provider and deployment environment.
+> *“OACP is a transport-neutral, contract-first protocol for governed agent‑runtime communication.”*
 
----
+OACP defines a typed envelope, deterministic processing gates, and a two‑axis profile system that makes agent communication **auditable, replay‑safe, and policy‑enforceable**. It is the missing governance and audit plane for autonomous AI agents.
 
-## 📦 Repository contents
+## Table of Contents
 
-- [`OACP_SPEC.md`](./OACP_SPEC.md) – The full v0.1 specification (approx. 160 KB).  
-- [`schemas/`](./schemas) – JSON Schema 2020-12 definitions for the envelope and core artifacts.  
-- [`bindings/`](./bindings) – Transport bindings (CloudEvents, AsyncAPI, OpenAPI, OpenTelemetry).  
-- [`conformance/`](./conformance) – Conformance test vectors.  
-- [`examples/`](./examples) – End‑to‑end example flows.  
-- `GOVERNANCE.md`, `CONTRIBUTING.md`, `SECURITY.md`, `IPR.md` – Project governance and legal posture.
-
----
-
-## 🧭 Why OACP exists
-
-Current agent communication protocols (A2A, MCP, ACNBP) solve transport, tool integration, and capability negotiation. **None** prescribe what *governed* agent communication looks like:
-- What makes a message replay‑safe?  
-- What constitutes an approval vs. a proposal?  
-- How do you enforce tenant isolation across references?  
-- What audit chain must a runtime produce?
-
-OACP fills that gap. It layers governance semantics on top of existing protocols without replacing them.
+- [Why OACP exists](#why-oacp-exists)
+- [What OACP is (and is not)](#what-oacp-is-and-is-not)
+- [Key features](#key-features)
+- [How OACP compares to other frameworks](#how-oacp-compares-to-other-frameworks)
+- [The OACP envelope and processing gates](#the-oacp-envelope-and-processing-gates)
+- [Safety boundary](#safety-boundary)
+- [Repository structure](#repository-structure)
+- [Getting started](#getting-started)
+- [Contributing](#contributing)
+- [Versioning and roadmap](#versioning-and-roadmap)
+- [License and IPR](#license-and-ipr)
+- [Contact](#contact)
 
 ---
 
-## 🔑 Key features
+## Why OACP exists
 
-- **Deterministic processing gates** – 15 validation steps (identity, tenant scope, authority, binding, authorization decision, idempotency, broker state, causation DAG, hash chain, etc.) before any business effect.
-- **Two‑axis profiles** – Base profiles (Core → Regulated) for assurance strictness, plus additive capability profiles (e.g., `OACP-Tool`, `OACP-Review`, `OACP-Proposal`).
-- **Typed references** – `ArtifactRef`, `MessageRef`, `RecordRef`, `DecisionRef`, `AuditRef` with tenant‑scoped resolution.
-- **Proposal/decision separation** – Agents emit proposals; approvals require separate decision artifacts. Self‑approval is forbidden.
-- **Run‑scoped hash chains** – Immutable audit trails per execution instance.
-- **Extensions that cannot weaken core** – Namespaced extensions can add stricter validation but never disable a core gate.
+Existing agent communication protocols solve important but narrow problems:
 
-See [`OACP_SPEC.md`](./OACP_SPEC.md) for the complete specification.
+- **A2A** (Agent‑to‑Agent) – discovery and task delegation.  
+- **MCP** (Model Context Protocol) – tool integration.  
+- **ACNBP** – capability negotiation.  
 
----
+None of them prescribe what *governed* agent communication looks like:
 
-## 🚦 Status
+- **What makes a message replay‑safe?**  
+- **What constitutes an approval vs. a proposal?**  
+- **How do you enforce tenant isolation across references?**  
+- **What audit chain must a runtime produce?**  
 
-| Tier | Description | Status |
-|------|-------------|--------|
-| Tier 1 – Protocol Works | Identity, binding, idempotency, broker, conversation | ✅ Frozen |
-| Tier 2 – Protocol Is Precise | Profiles, references, tenant isolation, review, proposal/decision | ✅ Frozen |
-| Tier 3 – Protocol Is Publishable | Threat model, versioning, schemas, bindings, conformance | ✅ Frozen (v0.1) |
-| Tier 4 – Governance‑Rich | Obligations, data handling, side‑effect classes, budgets, kill‑switch | 🔜 Scoped – v0.2 |
-| Tier 5 – Ecosystem‑Ready | Federation, formal registry, advanced regulated profiles | 🔜 Scoped – later |
-
-v0.1 is a **working draft**. Backward compatibility between v0.x releases is best‑effort; pin to a specific version for production experiments.
+OACP fills that gap. It layers governance semantics on top of existing protocols without replacing them. It is the **governance plane** that enterprises and regulated industries need to run AI agents safely.
 
 ---
 
-## 📖 Getting started
+## What OACP is (and is not)
 
-1. **Read the specification** – Start with [`OACP_SPEC.md`](./OACP_SPEC.md) §0 (Foreword) and §1 (Conventions).  
-2. **Explore the examples** – [`examples/`](./examples) contains step‑by‑step walks and standalone JSON envelopes.  
-3. **Run conformance tests** – Use the vectors in [`conformance/vectors/`](./conformance/vectors) to validate your implementation.  
-4. **Check the threat model** – See §26 of the spec for eight threat surfaces and mitigation strategies.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions that improve the specification, clarify ambiguities, fill threat model gaps, or add conformance test vectors.  
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for detailed guidelines.
-
-For security issues, follow the process in [`SECURITY.md`](./SECURITY.md). **Do not open a public issue for security findings.**
+| ✅ OACP is … | ❌ OACP is not … |
+|--------------|------------------|
+| A transport‑neutral protocol for governed agent communication | A replacement for A2A, MCP, or ACNBP (it layers on top) |
+| A deterministic processing model with 15 validation gates | A specification of agent reasoning or model behavior |
+| A proposal/decision boundary that prevents self‑approval | A transport‑layer security mechanism (TLS is assumed) |
+| A typed reference model with tenant‑scoped resolution | An identity provider or credential issuer |
+| A suite of conformance tests and bindings | A generic LLM wrapper or prompt registry |
 
 ---
 
-## 📄 License and IPR
+## Key features
 
-OACP v0.1 is published under the **Apache License 2.0**. A formal IPR policy with patent non‑assertion commitments is deferred until v1.0. See [`IPR.md`](./IPR.md) for details.
+### 1. Deterministic processing gates
+Every OACP message passes through 15 governance steps **before** any business effect occurs:
+
+1. Verify identity  
+2. Verify tenant/workspace scope  
+3. Verify participant authority  
+4. Verify capability binding  
+5. Verify authorization decision  
+6. Idempotency / retry / replay state  
+7. Broker state  
+8. Response correlation  
+9. Causation DAG  
+10. Conversation scope  
+11. Reference scope and integrity  
+12. Profile / extension precedence  
+13. Proposal / review / decision state  
+14. Message age / hash chain / signature  
+15. Payload validation  
+
+Each gate is separately auditable and policy‑enforceable.
+
+### 2. Two‑axis profile system
+- **Base profiles** (strict hierarchy): `OACP-Core` → `OACP-Operational` → `OACP-Governed` → `OACP-Regulated`  
+- **Capability profiles** (additive): `OACP-Capability`, `OACP-Binding`, `OACP-Reliable`, `OACP-Tool`, `OACP-Review`, `OACP-Proposal`, `OACP-Interop`
+
+### 3. Typed references with tenant isolation
+- `ArtifactRef` – external content (documents, tool inputs, evidence)  
+- `MessageRef` – OACP messages  
+- `RecordRef` – registry records  
+- `DecisionRef` – decisions (authorization, approvals, expirations)  
+- `AuditRef` – audit chain entries  
+
+All references are tenant‑scoped by default. Cross‑tenant flows require explicit registered policies.
+
+### 4. Proposal/decision separation
+- Agents emit **proposals** (recommendations).  
+- Approvals require separate **decision artifacts** (`ExternalDecisionRef` for humans, `RuntimeDecisionRef` for auto‑approval).  
+- Self‑approval is forbidden.  
+- Every proposal closure produces an immutable decision record.
+
+### 5. Run‑scoped hash chains & replay protection
+- Hash chains are scoped to a single `runId` – each run is an independent audit segment.  
+- Message‑age limits (configurable per profile).  
+- Replay is governed and requires explicit authorization.
+
+### 6. Extensions that cannot weaken core
+- Namespaced extensions (`x-org-*`, `x-vendor-*`, etc.)  
+- Required extensions can impose stricter validation but never disable a core gate.
+
+### 7. v0.2 candidates (coming soon)
+Building on community feedback, v0.2 will add:
+- **Trajectory‑level authorization & session risk memory** (closes the “slow‑burn” attack gap)  
+- **Pre‑execution run‑intent gate** (gate runs before any resource consumption)  
+- **Reasoning trace evidence** (auditable chain‑of‑thought)  
+- **Data handling block** with consent and purpose limitation  
+- **Kill‑switch / emergency stop** semantics  
+- **Tool side‑effect classes**, **evidence quality scoring**, and **policy simulation**.
+
+See [`V0.2_CANDIDATES.md`](./V0.2_CANDIDATES.md) for the full list.
 
 ---
 
-## 🧭 Reference implementation
+## How OACP compares to other frameworks
 
-**Ojas** is the reference implementation of OACP. It is not required for OACP conformance; the protocol is implementation‑neutral.
+| Framework / Protocol | Core Focus | OACP relationship |
+|----------------------|------------|-------------------|
+| **Microsoft Agent Governance Toolkit** | Runtime policy enforcement, execution sandbox | OACP defines the governance contract that such toolkits can **implement** |
+| **AEGIS (pre‑execution firewall)** | Tool‑call validation, approval workflows | OACP provides the **protocol‑level** authorization and audit layer that AEGIS can enforce |
+| **MCP / A2A / ACNBP** | Connectivity, tool integration, capability negotiation | OACP layers **governance envelopes** on top; they complement, not compete |
+| **Zep / Mem0 / Letta** | Vector memory, session memory | OACP defines **governed memory retrieval** (permission‑first, policy‑aware) |
+| **Superagent** | Guardrails, safety policies | OACP’s policy memory and authorization decisions provide a protocol‑level home for such guardrails |
+
+**Key differentiator:** OACP is the only **vendor‑neutral, transport‑neutral specification** for agent governance. Others are implementations or tool‑specific libraries.
 
 ---
 
-## 📬 Contact
+## The OACP envelope and processing gates
 
-For questions about the specification or governance, please open a GitHub Discussion or reach out via the maintainer contact in [`GOVERNANCE.md`](./GOVERNANCE.md).
+A minimal OACP envelope looks like:
+
+```json
+{
+  "oacpVersion": "0.1",
+  "messageId": "msg_001",
+  "messageKind": "PROPOSAL",
+  "messageType": "PROPOSAL_EMITTED",
+  "createdAt": "2026-05-06T10:00:00Z",
+  "scope": { "tenantId": "tenant_001" },
+  "from": { ... },
+  "integrity": { ... },
+  "payload": { ... }
+}
