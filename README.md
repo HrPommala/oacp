@@ -3,7 +3,9 @@
 **Version:** 0.1 (working draft)  
 **Status:** Draft for review  
 **License:** Apache 2.0  
-**Reference implementation:** Ojas (pending)
+**Reference implementation:** Ojas (pending)  
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 > **OACP is a transport‑neutral, contract‑first protocol for governed agent‑runtime communication.**  
 > It makes agent communication **deterministic, auditable, replay‑safe, and policy‑enforceable**.
