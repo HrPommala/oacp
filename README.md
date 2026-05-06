@@ -63,7 +63,7 @@ These ten invariants are **frozen for v0.1** and will not be relaxed in later ve
 
 Every OACP message passes through these gates **in strict order**. Failure at any gate produces a structured error and halts processing.
 
-```
+```text
 1.   Verify identity                               (§3a)
 1.5. Verify tenant/workspace/system scope          (§2d)
 2.   Verify participant authority                  (§3a.8)
@@ -126,6 +126,7 @@ OACP defines five reference subtypes, each answering a different question:
 **Tenant isolation invariant:** every reference resolved by a receiver MUST be within the receiver's authorized tenant scope. Cross‑tenant references require an explicit registered policy (`crossTenantPolicyRef`).
 
 Four enforcement points:
+
 1. At message receipt (`scope.tenantId` in receiver's scope)  
 2. At identity verification (identity's `tenantScope` includes `tenantId`)  
 3. At reference resolution (reference's tenant matches message's tenant)  
@@ -205,7 +206,7 @@ See [`SECURITY.md`](./SECURITY.md) and §26 of the spec for full details.
 
 ## Repository structure
 
-```
+```text
 oacp/
 ├── README.md                  ← this file
 ├── LICENSE                    ← Apache 2.0
